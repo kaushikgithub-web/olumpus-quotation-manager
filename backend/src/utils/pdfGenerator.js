@@ -1,21 +1,23 @@
-import puppeteer from "puppeteer";
+import puppeteer from 'puppeteer'
 
-let browserPromise = null;
+// Reuse a single browser instance across requests instead of launching a
+// fresh one every time — launching Chromium is slow (roughly 1-2 seconds)
+// and unnecessary; only closing/reopening pages per request is needed.
+let browserPromise = null
 
 function getBrowser() {
   if (!browserPromise) {
     browserPromise = puppeteer.launch({
       headless: true,
-      executablePath: puppeteer.executablePath(),
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-      ],
-    });
+      // --no-sandbox is required on most Linux hosting platforms (including
+      // Render's free tier) where Chromium's default sandbox needs kernel
+      // privileges the container doesn't grant.
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
   }
-
-  return browserPromise;
+  return browserPromise
 }
+
 /**
  * Renders an HTML string to a PDF buffer. Margins are intentionally 0 here
  * — renderQuotationHtml.js already builds its own margins/border into the

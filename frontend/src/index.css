@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette pulled directly from the original quotation template */
+  --color-brand-dark: #1F497D;
+  --color-brand-mid: #365F91;
+  --color-brand-light: #4F81BD;
+  --color-brand-bg: #F5F8FC;
+
+  --font-sans: "Calibri", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-brand-bg text-slate-800 font-sans antialiased;
+}

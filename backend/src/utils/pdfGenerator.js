@@ -8,11 +8,12 @@ let browserPromise = null
 function getBrowser() {
   if (!browserPromise) {
     browserPromise = puppeteer.launch({
-      headless: true,
-      // --no-sandbox is required on most Linux hosting platforms (including
-      // Render's free tier) where Chromium's default sandbox needs kernel
-      // privileges the container doesn't grant.
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+     headless: true, // or 'new' depending on your Puppeteer version
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage', // Prevents memory limitations in containers
+  ],
     })
   }
   return browserPromise

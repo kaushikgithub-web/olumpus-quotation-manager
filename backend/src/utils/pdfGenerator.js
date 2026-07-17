@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer'
 import { computeExecutablePath } from "@puppeteer/browsers";
+import fs from "fs";
 
 // Reuse a single browser instance across requests instead of launching a
 // fresh one every time — launching Chromium is slow (roughly 1-2 seconds)
@@ -7,8 +8,14 @@ import { computeExecutablePath } from "@puppeteer/browsers";
 let browserPromise = null
 
 
+console.log("PUPPETEER_CACHE_DIR =", process.env.PUPPETEER_CACHE_DIR);
+
 function getBrowser() {
   if (!browserPromise) {
+    
+    console.log("Chrome exists:",
+      fs.existsSync("/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome")
+    );
     browserPromise = puppeteer.launch({
       executablePath: computeExecutablePath({
         browser: "chrome",

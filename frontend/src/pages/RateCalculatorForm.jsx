@@ -187,7 +187,7 @@ export default function RateCalculatorForm() {
 
   return (
     <div className="max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark mb-1">
             {isEditMode ? 'Edit Calculation' : 'New Rate Calculation'}
@@ -199,7 +199,7 @@ export default function RateCalculatorForm() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors disabled:opacity-60"
+          className="flex items-center justify-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors disabled:opacity-60 shrink-0"
         >
           <Save size={15} />
           {saving ? 'Saving…' : 'Save'}
@@ -215,7 +215,7 @@ export default function RateCalculatorForm() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT COLUMN: all inputs */}
         <div className="space-y-5">
           {/* Glass identity */}
@@ -335,44 +335,48 @@ export default function RateCalculatorForm() {
                 Add layer
               </button>
             </div>
-            <div className="grid grid-cols-[minmax(220px,1fr)_100px_32px] gap-2 mb-2">
-  <span className="text-xs font-medium text-slate-500">
-    Layer name
-  </span>
-  <span className="text-xs font-medium text-slate-500 text-center">
-    Cost (₹)
-  </span>
-  <span />
-</div>
-            <div className="space-y-2">
-              {form.combination_layers.map((layer, i) => (
-                <div
-  key={i}
-  className="grid grid-cols-[minmax(220px,1fr)_100px_32px] gap-2 items-center"
->
-                  <input
-                    type="text"
-                    value={layer.label}
-                    onChange={(e) => updateLayer(i, { label: e.target.value })}
-                    placeholder="e.g. Tempering"
-                    className="w-full border border-slate-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-light"
-                  />
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={layer.cost}
-                    onChange={(e) => updateLayer(i, { cost: e.target.value })}
-                    placeholder="0.00"
-                    className={`${inputClass} w-full text-center`}
-                  />
-                  <button
-                    onClick={() => removeLayer(i)}
-                    className="flex justify-center items-center p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+            <div className="overflow-x-auto">
+              <div className="min-w-[320px]">
+                <div className="grid grid-cols-[minmax(140px,1fr)_84px_32px] gap-2 mb-2">
+                  <span className="text-xs font-medium text-slate-500">
+                    Layer name
+                  </span>
+                  <span className="text-xs font-medium text-slate-500 text-center">
+                    Cost (₹)
+                  </span>
+                  <span />
                 </div>
-              ))}
+                <div className="space-y-2">
+                  {form.combination_layers.map((layer, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-[minmax(140px,1fr)_84px_32px] gap-2 items-center"
+                    >
+                      <input
+                        type="text"
+                        value={layer.label}
+                        onChange={(e) => updateLayer(i, { label: e.target.value })}
+                        placeholder="e.g. Tempering"
+                        className="w-full border border-slate-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-light"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={layer.cost}
+                        onChange={(e) => updateLayer(i, { cost: e.target.value })}
+                        placeholder="0.00"
+                        className={`${inputClass} w-full text-center`}
+                      />
+                      <button
+                        onClick={() => removeLayer(i)}
+                        className="flex justify-center items-center p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             {form.combination_layers.some((l) => !l.label.trim() && Number(l.cost) > 0) && (
               <p className="text-xs text-amber-600 mt-2">
@@ -392,7 +396,7 @@ export default function RateCalculatorForm() {
             <h3 className="text-sm font-semibold text-slate-700 mb-3">
               Stage 3 — Freight, Insurance &amp; GST
             </h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className={labelClass}>Freight (₹)</label>
                 <input type="number" step="0.01" value={form.freight} onChange={(e) => set('freight', e.target.value)} className={inputClass} />
@@ -439,7 +443,7 @@ export default function RateCalculatorForm() {
         </div>
 
         {/* RIGHT COLUMN: live results, read-only */}
-        <div className="bg-white border border-slate-200 rounded-lg p-5 h-fit sticky top-6">
+        <div className="bg-white border border-slate-200 rounded-lg p-5 h-fit lg:sticky lg:top-6">
           <h3 className="text-sm font-semibold text-slate-700 mb-4">Live Calculation</h3>
 
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">
@@ -495,9 +499,9 @@ export default function RateCalculatorForm() {
 
 function FieldRow({ label, children }) {
   return (
-    <div className="py-2.5 flex items-center justify-between gap-4">
-      <span className="text-sm text-slate-600 shrink-0">{label}</span>
-      <div className="w-36">{children}</div>
+    <div className="py-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+      <span className="text-sm text-slate-600">{label}</span>
+      <div className="w-full sm:w-36 shrink-0">{children}</div>
     </div>
   )
 }
@@ -510,11 +514,11 @@ function ComputedRow({ label, sublabel, value, muted }) {
         muted ? 'opacity-60' : '',
       ].join(' ')}
     >
-      <div>
+      <div className="min-w-0">
         <span className="text-sm font-medium text-slate-700">{label}</span>
         {sublabel && <p className="text-xs text-slate-400">{sublabel}</p>}
       </div>
-      <span className="text-sm font-semibold text-brand-dark w-36 text-right">
+      <span className="text-sm font-semibold text-brand-dark w-28 sm:w-36 text-right shrink-0">
         ₹{fmt(value)}
       </span>
     </div>

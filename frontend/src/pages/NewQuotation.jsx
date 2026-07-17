@@ -219,7 +219,7 @@ export default function NewQuotation() {
 
   return (
     <div className="max-w-3xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark mb-1">
             {isEditMode ? 'Edit Quotation' : 'New Quotation'}
@@ -229,7 +229,7 @@ export default function NewQuotation() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isEditMode && (
             <button
               onClick={handleDuplicate}
@@ -276,7 +276,7 @@ export default function NewQuotation() {
 
       {/* --- Client & project details --- */}
       <div className="bg-white border border-slate-200 rounded-lg p-5 mb-5">
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Client name
@@ -316,7 +316,7 @@ export default function NewQuotation() {
           />
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
             <input

@@ -27,15 +27,15 @@ export default function QuotationItemRow({ item, index, products, onChange, onRe
 
   return (
     <div className="border border-slate-200 rounded-lg p-4 bg-white">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <span className="w-6 h-6 flex items-center justify-center rounded-full bg-brand-dark text-white text-xs font-medium shrink-0">
             {index + 1}
           </span>
           <select
             value={item.product_id || ''}
             onChange={handleProductSelect}
-            className="border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-light max-w-xs"
+            className="border border-slate-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-light w-full sm:max-w-xs min-w-0"
           >
             <option value="">Custom (no product selected)</option>
             {products.map((p) => (
@@ -62,7 +62,7 @@ export default function QuotationItemRow({ item, index, products, onChange, onRe
         onChange={(html) => onChange({ ...item, description: html })}
       />
 
-      <div className="grid grid-cols-3 gap-3 mt-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Rate (₹)</label>
           <input

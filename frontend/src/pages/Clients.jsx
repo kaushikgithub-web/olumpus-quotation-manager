@@ -85,7 +85,7 @@ export default function Clients() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark mb-1">Clients</h1>
           <p className="text-sm text-slate-500">
@@ -94,14 +94,14 @@ export default function Clients() {
         </div>
         <button
           onClick={openAddModal}
-          className="flex items-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors shrink-0"
+          className="flex items-center justify-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors shrink-0"
         >
           <Plus size={16} />
           Add client
         </button>
       </div>
 
-      <div className="relative mb-4 max-w-sm">
+      <div className="relative mb-4 w-full sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
         <input
           type="text"
@@ -134,47 +134,49 @@ export default function Clients() {
             </p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-left text-slate-500">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Company</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">GST No.</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((c) => (
-                <tr key={c.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-800">{c.name}</td>
-                  <td className="px-4 py-3 text-slate-500">{c.company || '—'}</td>
-                  <td className="px-4 py-3 text-slate-500">{c.phone || '—'}</td>
-                  <td className="px-4 py-3 text-slate-500">{c.email || '—'}</td>
-                  <td className="px-4 py-3 text-slate-500">{c.gst_number || '—'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1">
-                      <button
-                        onClick={() => openEditModal(c)}
-                        title="Edit"
-                        className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded"
-                      >
-                        <Pencil size={15} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(c)}
-                        title="Delete"
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[720px]">
+              <thead>
+                <tr className="border-b border-slate-200 text-left text-slate-500">
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium">Company</th>
+                  <th className="px-4 py-3 font-medium">Phone</th>
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">GST No.</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((c) => (
+                  <tr key={c.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                    <td className="px-4 py-3 font-medium text-slate-800">{c.name}</td>
+                    <td className="px-4 py-3 text-slate-500">{c.company || '—'}</td>
+                    <td className="px-4 py-3 text-slate-500">{c.phone || '—'}</td>
+                    <td className="px-4 py-3 text-slate-500">{c.email || '—'}</td>
+                    <td className="px-4 py-3 text-slate-500">{c.gst_number || '—'}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => openEditModal(c)}
+                          title="Edit"
+                          className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(c)}
+                          title="Delete"
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

@@ -59,7 +59,7 @@ export default function RateMaster() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark mb-1">Rate Master</h1>
           <p className="text-sm text-slate-500">
@@ -69,7 +69,7 @@ export default function RateMaster() {
         <button
           onClick={handleSaveAll}
           disabled={dirtyIds.length === 0 || saving}
-          className="flex items-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+          className="flex items-center justify-center gap-1.5 bg-brand-dark hover:bg-brand-mid text-white text-sm font-medium rounded-md px-4 py-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
         >
           <Save size={16} />
           {saving
@@ -104,43 +104,45 @@ export default function RateMaster() {
             </p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 text-left text-slate-500">
-                <th className="px-4 py-3 font-medium">Product</th>
-                <th className="px-4 py-3 font-medium">Unit</th>
-                <th className="px-4 py-3 font-medium text-right w-40">Rate (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => {
-                const value = edits[p.id] ?? p.default_rate ?? ''
-                const isDirty = dirtyIds.includes(p.id)
-                return (
-                  <tr
-                    key={p.id}
-                    className={[
-                      'border-b border-slate-100 last:border-0',
-                      isDirty ? 'bg-amber-50' : 'hover:bg-slate-50',
-                    ].join(' ')}
-                  >
-                    <td className="px-4 py-3 font-medium text-slate-800">{p.name}</td>
-                    <td className="px-4 py-3 text-slate-500">{p.default_unit || '—'}</td>
-                    <td className="px-4 py-3 text-right">
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={value}
-                        onChange={(e) => handleRateChange(p.id, e.target.value)}
-                        className="w-32 border border-slate-300 rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-light"
-                      />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
+              <thead>
+                <tr className="border-b border-slate-200 text-left text-slate-500">
+                  <th className="px-4 py-3 font-medium">Product</th>
+                  <th className="px-4 py-3 font-medium">Unit</th>
+                  <th className="px-4 py-3 font-medium text-right w-40">Rate (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((p) => {
+                  const value = edits[p.id] ?? p.default_rate ?? ''
+                  const isDirty = dirtyIds.includes(p.id)
+                  return (
+                    <tr
+                      key={p.id}
+                      className={[
+                        'border-b border-slate-100 last:border-0',
+                        isDirty ? 'bg-amber-50' : 'hover:bg-slate-50',
+                      ].join(' ')}
+                    >
+                      <td className="px-4 py-3 font-medium text-slate-800">{p.name}</td>
+                      <td className="px-4 py-3 text-slate-500">{p.default_unit || '—'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={value}
+                          onChange={(e) => handleRateChange(p.id, e.target.value)}
+                          className="w-32 border border-slate-300 rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-light"
+                        />
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

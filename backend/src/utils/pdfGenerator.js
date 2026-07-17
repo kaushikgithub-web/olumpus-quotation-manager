@@ -1,34 +1,21 @@
 import puppeteer from 'puppeteer'
-import { computeExecutablePath } from "@puppeteer/browsers";
-import fs from "fs";
 
 // Reuse a single browser instance across requests instead of launching a
 // fresh one every time — launching Chromium is slow (roughly 1-2 seconds)
 // and unnecessary; only closing/reopening pages per request is needed.
 let browserPromise = null
 
-
-console.log("PUPPETEER_CACHE_DIR =", process.env.PUPPETEER_CACHE_DIR);
-
 function getBrowser() {
   if (!browserPromise) {
-    
-    console.log("Chrome exists:",
-      fs.existsSync("/opt/render/.cache/puppeteer/chrome/linux-138.0.7204.168/chrome-linux64/chrome")
-    );
     browserPromise = puppeteer.launch({
-      executablePath: computeExecutablePath({
-        browser: "chrome",
-        buildId: "138.0.7204.168",
-      }),
       headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-      ],
-    });
+      // --no-sandbox is required on most Linux hosting platforms (including
+      // Render's free tier) where Chromium's default sandbox needs kernel
+      // privileges the container doesn't grant.
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
   }
-  return browserPromise;
+  return browserPromise
 }
 
 /**

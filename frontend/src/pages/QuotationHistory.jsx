@@ -9,6 +9,7 @@ import {
   deleteQuotation,
 } from '../lib/quotationsApi'
 import ConfirmDialog from '../components/ConfirmDialog'
+import { useUserRole } from '../lib/useUserRole'
 
 const STATUS_OPTIONS = ['draft', 'sent', 'accepted', 'rejected', 'expired']
 
@@ -23,6 +24,7 @@ const STATUS_STYLES = {
 export default function QuotationHistory() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isOwner, loading: roleLoading } = useUserRole()
 
   const [quotations, setQuotations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -129,7 +131,13 @@ export default function QuotationHistory() {
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-brand-dark mb-1">Quotation History</h1>
-        <p className="text-sm text-slate-500">Search, edit, or duplicate past quotations.</p>
+        <p className="text-sm text-slate-500">
+          {roleLoading
+            ? 'Search, edit, or duplicate past quotations.'
+            : isOwner
+            ? 'Showing quotations from every user (Owner view).'
+            : 'Showing only quotations you created.'}
+        </p>
       </div>
 
       {savedBanner && (
@@ -220,87 +228,87 @@ export default function QuotationHistory() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[920px]">
-              <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-500">
-                  <th className="px-4 py-3 font-medium">Reference No.</th>
-                  <th className="px-4 py-3 font-medium">Client</th>
-                  <th className="px-4 py-3 font-medium">Project</th>
-                  <th className="px-4 py-3 font-medium">Date</th>
-                  <th className="px-4 py-3 font-medium">Created by</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quotations.map((q) => (
-                  <tr key={q.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-800">{q.reference_number}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {q.clients?.name || '—'}
-                      {q.clients?.company && (
-                        <span className="text-slate-400"> — {q.clients.company}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{q.project_name || '—'}</td>
-                    <td className="px-4 py-3 text-slate-500">{q.quotation_date}</td>
-                    <td className="px-4 py-3 text-slate-500">{q.created_by_email || '—'}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={[
-                          'inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize',
-                          STATUS_STYLES[q.status] || 'bg-slate-100 text-slate-600',
-                        ].join(' ')}
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-slate-500">
+                <th className="px-4 py-3 font-medium">Reference No.</th>
+                <th className="px-4 py-3 font-medium">Client</th>
+                <th className="px-4 py-3 font-medium">Project</th>
+                <th className="px-4 py-3 font-medium">Date</th>
+                <th className="px-4 py-3 font-medium">Created by</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quotations.map((q) => (
+                <tr key={q.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                  <td className="px-4 py-3 font-medium text-slate-800">{q.reference_number}</td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {q.clients?.name || '—'}
+                    {q.clients?.company && (
+                      <span className="text-slate-400"> — {q.clients.company}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">{q.project_name || '—'}</td>
+                  <td className="px-4 py-3 text-slate-500">{q.quotation_date}</td>
+                  <td className="px-4 py-3 text-slate-500">{q.created_by_email || '—'}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={[
+                        'inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize',
+                        STATUS_STYLES[q.status] || 'bg-slate-100 text-slate-600',
+                      ].join(' ')}
+                    >
+                      {q.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-1">
+                      <button
+                        onClick={() => navigate(`/new-quotation/${q.id}`)}
+                        title="Edit"
+                        className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded"
                       >
-                        {q.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-1">
-                        <button
-                          onClick={() => navigate(`/new-quotation/${q.id}`)}
-                          title="Edit"
-                          className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded"
-                        >
-                          <Pencil size={15} />
-                        </button>
-                        <button
-                          onClick={() => handleDownloadPdf(q)}
-                          disabled={downloadingId === q.id}
-                          title="Download PDF"
-                          className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
-                        >
-                          <FileDown size={15} />
-                        </button>
-                        <button
-                          onClick={() => handlePrint(q)}
-                          disabled={printingId === q.id}
-                          title="Print"
-                          className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
-                        >
-                          <Printer size={15} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(q)}
-                          title="Delete"
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                        <button
-                          onClick={() => handleDuplicate(q.id)}
-                          disabled={duplicatingId === q.id}
-                          title="Duplicate"
-                          className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
-                        >
-                          <Copy size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        <Pencil size={15} />
+                      </button>
+                      <button
+                        onClick={() => handleDownloadPdf(q)}
+                        disabled={downloadingId === q.id}
+                        title="Download PDF"
+                        className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
+                      >
+                        <FileDown size={15} />
+                      </button>
+                      <button
+                        onClick={() => handlePrint(q)}
+                        disabled={printingId === q.id}
+                        title="Print"
+                        className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
+                      >
+                        <Printer size={15} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(q)}
+                        title="Delete"
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                      <button
+                        onClick={() => handleDuplicate(q.id)}
+                        disabled={duplicatingId === q.id}
+                        title="Duplicate"
+                        className="p-1.5 text-slate-400 hover:text-brand-dark hover:bg-slate-100 rounded disabled:opacity-50"
+                      >
+                        <Copy size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           </div>
         )}
       </div>

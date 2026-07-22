@@ -87,9 +87,14 @@ export default function NewQuotation() {
               : [emptyItem()]
           )
         } else {
-          const ref = await getNextReferenceNumber()
-          if (cancelled) return
-          setReferenceNumber(ref)
+          // Deliberately NOT calling getNextReferenceNumber() here. That
+          // call atomically increments the real counter in Postgres — if
+          // we ran it just for opening this page, every visit (even ones
+          // where the user backs out without saving) would burn a real
+          // number, causing exactly the gap-in-numbering bug this comment
+          // replaces. The reference number is now only assigned inside
+          // handleSave, the moment a quotation is actually created.
+          setReferenceNumber('')
         }
       } catch (err) {
         if (!cancelled) setError(err.message || 'Failed to load.')
@@ -140,9 +145,19 @@ export default function NewQuotation() {
 
     setSaving(true)
     try {
+      // Reference number is assigned HERE — the moment of actually saving —
+      // not when the page loaded. This is what stops every page visit from
+      // burning a real number; see the comment in the loader effect above.
+      // Edit mode keeps its existing number and never requests a new one.
+      let refToUse = referenceNumber
+      if (!isEditMode) {
+        refToUse = await getNextReferenceNumber()
+        setReferenceNumber(refToUse)
+      }
+
       const payload = {
         quotation: {
-          reference_number: referenceNumber,
+          reference_number: refToUse,
           project_name: projectName.trim() || null,
           quotation_date: quotationDate,
           validity_days: Number(validityDays) || null,
@@ -168,7 +183,7 @@ export default function NewQuotation() {
         await createQuotation(payload)
       }
 
-      navigate('/quotation-history', { state: { saved: true, reference: referenceNumber } })
+      navigate('/quotation-history', { state: { saved: true, reference: refToUse } })
     } catch (err) {
       setError(err.message || 'Failed to save quotation.')
     } finally {
@@ -219,17 +234,25 @@ export default function NewQuotation() {
 
   return (
     <div className="max-w-3xl">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-brand-dark mb-1">
             {isEditMode ? 'Edit Quotation' : 'New Quotation'}
           </h1>
           <p className="text-sm text-slate-500">
-            Ref. No. <span className="font-medium text-slate-700">{referenceNumber}</span>
+            {referenceNumber ? (
+              <>
+                Ref. No. <span className="font-medium text-slate-700">{referenceNumber}</span>
+              </>
+            ) : (
+              <span className="text-slate-400 italic">
+                Reference number will be assigned when you save
+              </span>
+            )}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {isEditMode && (
             <button
               onClick={handleDuplicate}

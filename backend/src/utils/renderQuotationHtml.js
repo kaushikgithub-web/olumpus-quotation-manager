@@ -64,19 +64,57 @@ function formatRate(rate) {
   return Number.isInteger(num) ? String(num) : num.toFixed(2)
 }
 
+function formatArea(qty) {
+  if (qty == null || qty === '') return ''
+  const num = Number(qty)
+  return Number.isInteger(num) ? String(num) : num.toFixed(2)
+}
+
+/** Amount uses Indian digit grouping + 2 decimals, e.g. "47,85,732.00" —
+ * matches the original quotation's AMOUNT column exactly. */
+function formatAmount(amount) {
+  return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 function renderItemsRows(items) {
   return items
-    .map(
-      (item, index) => `
+    .map((item, index) => {
+      const rate = Number(item.rate) || 0
+      const qty = item.quantity != null && item.quantity !== '' ? Number(item.quantity) : null
+      // AMOUNT only makes sense when Area/quantity is actually given — a
+      // line item with no quantity (quantity is optional, per the original
+      // spec) shows a blank Amount rather than a misleading rate-only figure.
+      const amount = qty != null ? rate * qty : null
+
+      return `
       <tr>
         <td class="sno-cell">${index + 1}</td>
         <td class="desc-cell">${item.description || ''}</td>
         <td class="rate-cell">${formatRate(item.rate)}${
-          item.unit ? ` / ${escapeHtml(item.unit)}` : ''
+          item.unit ? ` /${escapeHtml(item.unit)}` : ''
         }</td>
+        <td class="area-cell">${formatArea(item.quantity)}</td>
+        <td class="amount-cell">${amount != null ? formatAmount(amount) : ''}</td>
       </tr>`
-    )
+    })
     .join('\n')
+}
+
+/** Grand total — sum of every line item's Rate × Area. Items with no Area
+ * entered contribute nothing (can't compute an amount without a quantity),
+ * consistent with them showing a blank Amount cell above. */
+function renderTotalRow(items) {
+  const grandTotal = items.reduce((sum, item) => {
+    const rate = Number(item.rate) || 0
+    const qty = item.quantity != null && item.quantity !== '' ? Number(item.quantity) : null
+    return qty != null ? sum + rate * qty : sum
+  }, 0)
+
+  return `
+    <tr class="total-row">
+      <td colspan="4" class="total-label">TOTAL</td>
+      <td class="amount-cell">${formatAmount(grandTotal)}</td>
+    </tr>`
 }
 
 export function renderQuotationHtml({ quotation, client, items, settings }) {
@@ -121,8 +159,8 @@ export function renderQuotationHtml({ quotation, client, items, settings }) {
   }
   .company-name {
     text-align: center;
-    color: ${COLORS.dark};
-    font-family:'Algerian', 'Impact', 'Arial Black', fantasy;
+    color: ${COLORS.mid};
+    font-family: 'Rye', 'Algerian', 'Impact', 'Arial Black', fantasy;
     font-size: 18pt;
     font-weight: normal;
     letter-spacing: 0.5px;
@@ -134,7 +172,7 @@ export function renderQuotationHtml({ quotation, client, items, settings }) {
     margin: 2px 0;
   }
   .company-detail a { color: ${COLORS.light}; text-decoration: underline; }
-  .logo { display: block; margin: 0 auto 10px auto; max-height: 55px; }
+  .logo { display: block; margin: 0 auto 6px auto; max-height: 55px; }
   .quotation-title {
     text-align: center;
     font-weight: bold;
@@ -197,7 +235,11 @@ export function renderQuotationHtml({ quotation, client, items, settings }) {
     color: #000;
     font-size: 9.5pt;
   }
-  .rate-cell { text-align: center; font-weight: bold; width: 130px; white-space: nowrap; }
+  .rate-cell { text-align: center; font-weight: bold; width: 95px; white-space: nowrap; }
+  .area-cell { text-align: center; font-weight: bold; width: 80px; }
+  .amount-cell { text-align: right; font-weight: bold; width: 110px; white-space: nowrap; }
+  .total-row .total-label { text-align: right; font-weight: bold; }
+  .total-row td { border-top: 2px solid #000; }
   .terms-section { margin-left: 24px; }
   .terms-title { font-weight: bold; text-decoration: underline; margin-bottom: 8px; break-after: avoid; page-break-after: avoid; }
   .terms-list { margin: 0 0 20px 0; padding-left: 0; list-style: none; }
@@ -256,11 +298,14 @@ export function renderQuotationHtml({ quotation, client, items, settings }) {
           <tr>
             <th style="width:50px;">S.No.</th>
             <th>Description</th>
-            <th style="width:130px;">Rate (Rs.)</th>
+            <th style="width:95px;">Rate (Rs.)</th>
+            <th style="width:80px;">Area</th>
+            <th style="width:110px;">Amount</th>
           </tr>
         </thead>
         <tbody>
           ${renderItemsRows(items)}
+          ${renderTotalRow(items)}
         </tbody>
       </table>
 

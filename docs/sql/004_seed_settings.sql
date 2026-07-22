@@ -25,8 +25,8 @@ values (
   '{}'::jsonb,
   '[
     "GST will be extra.",
-    "Packing and Forwarding **INCLUDED** in Rate.",
-    "**Wastage INCLUDED** (as per current sizes provided, variation in sizes might attract changes in wastage charged)",
+    "Packing and Forwarding **EXTRA** in Rate.",
+    "**Wastage EXTRA** (as per current sizes provided, variation in sizes might attract changes in wastage charged)",
     "**Design wastage/ Geometrical cutting wastage** shall be extra as applicable.",
     "**Large size (above 8 sqm or any single side dimension of 3660 & above)** will be charged extra @ 20% on basic price",
     "**Extra Large size (Sizes above 2500mm x 2500mm or 4270mm)** will be charged extra @ 30% on basic price.",
